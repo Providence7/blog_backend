@@ -55,7 +55,7 @@ app.use((error, req, res, next) => {
   res.status(error.status || 500);
 
   res.json({
-    message: error.message || "Something went wrong!",
+    message: error.message || "Something is wrong!",
     status: error.status,
     stack: error.stack,
   });
