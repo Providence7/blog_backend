@@ -19,9 +19,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-  origin: "https://fashionera.onrender.com",  // ✅ Only allow frontend
-  credentials: true,
-  methods: "GET, POST, PUT, DELETE",
+  origin: { origin: "*" },  // ✅ Only allow frontend
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.get('/', (req, res)=>{
