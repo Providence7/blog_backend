@@ -18,10 +18,13 @@ const app = express();
 // app.use("/webhooks", webhookRouter);
 app.use(express.json());
 
-app.use(cors({
-  origin: { origin: "*" },  // ✅ Only allow frontend
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+app.use(
+  cors({
+    origin: "*", // Change to frontend URL when deploying
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.get('/', (req, res)=>{
   res.status(200).json({message : "server is live"})
 })
