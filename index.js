@@ -18,14 +18,11 @@ const app = express();
 // app.use("/webhooks", webhookRouter);
 app.use(express.json());
 
-app.use(
-  cors({
-    origin:  ["https://fashionera.onrender.com"], // Change to frontend URL when deploying
-    methods: ["GET", "POST", "PUT", "DELETE"],
-   credentials: true, // Allow cookies if needed
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+app.use(cors({
+  origin: 'https://myfashion-b8i1.onrender.com', // Allow only your frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.get('/', (req, res)=>{
   res.status(200).json({message : "server is live"})
 })
