@@ -9,7 +9,7 @@ export const getPosts = async (req, res) => {
   const limit = parseInt(req.query.limit) || 2;
 
   const query = {};
-
+// new changes
   console.log(req.query);
 
   const cat = req.query.cat;
