@@ -10,7 +10,10 @@ import dotenv from "dotenv"
 dotenv.config()
 const app = express();
 
-app.use(cors(process.env.CLIENT_URL));
+app.use(cors({
+  origin: ["https://fashionera.onrender.com"], // Only allow this frontend
+  credentials: true, // Allow cookies if needed
+}));
 // app.use(clerkMiddleware());
 // app.use("/webhooks", webhookRouter);
 app.use(express.json());
