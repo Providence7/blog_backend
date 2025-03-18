@@ -24,7 +24,9 @@ app.use(cors({
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"]
 }));
-
+app.get('/', (req, res)=>{
+  res.status(200).json({message : "server is live"})
+})
 
 // app.get("/test",(req,res)=>{
 //   res.status(200).send("it works!")
