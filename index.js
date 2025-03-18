@@ -10,22 +10,21 @@ import dotenv from "dotenv"
 dotenv.config()
 const app = express();
 
-app.use(cors({
-  origin: ["https://fashionera.onrender.com"], // Only allow this frontend
-  credentials: true, // Allow cookies if needed
-}));
+// app.use(cors({
+//   origin: ["https://fashionera.onrender.com"], // Only allow this frontend
+//   credentials: true, // Allow cookies if needed
+// }));
 // app.use(clerkMiddleware());
 // app.use("/webhooks", webhookRouter);
 app.use(express.json());
 
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
+app.use(cors({
+  origin: "https://fashionera.onrender.com", // Use your frontend URL
+  credentials: true, // Allow cookies & authentication
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"]
+}));
+
 
 // app.get("/test",(req,res)=>{
 //   res.status(200).send("it works!")
