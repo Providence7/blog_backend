@@ -22,6 +22,7 @@ app.use(
   cors({
     origin:  ["https://fashionera.onrender.com"], // Change to frontend URL when deploying
     methods: ["GET", "POST", "PUT", "DELETE"],
+   credentials: true, // Allow cookies if needed
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
