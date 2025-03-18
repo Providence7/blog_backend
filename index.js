@@ -20,7 +20,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "*", // Change to frontend URL when deploying
+    origin:  ["https://fashionera.onrender.com"], // Change to frontend URL when deploying
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
