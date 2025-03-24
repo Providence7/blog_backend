@@ -1,6 +1,6 @@
 import  express from 'express';
 import passport from 'passport';
-import { verifyGoogleToken} from '../middleware/authMiddleware'
+import { verifyGoogleToken} from '../middleware/authMiddleware.js'
 const router = express.Router();
 // Google OAuth routes
 
