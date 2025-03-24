@@ -1,5 +1,6 @@
 import  express from 'express';
 import passport from 'passport';
+import { verifyGoogleToken} from '../middleware/authMiddleware'
 const router = express.Router();
 // Google OAuth routes
 
@@ -26,8 +27,7 @@ router.get('/logout', (req, res) => {
 });
 
 // Route to get the profile data
-router.get('/profile', (req, res) => {
-  if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
+router.get('/profile',verifyGoogleToken, (req, res) => {
   res.json(req.user);
 });
 
