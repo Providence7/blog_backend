@@ -18,7 +18,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 const corsOptions = {
-  origin: "http://localhost:5173", // Frontend URL
+  origin: "https://myfashion-b8i1.onrender.com", // Frontend URL
   methods: "GET, POST, PUT, DELETE",
   credentials: true, // Allow cookies to be sent with requests
 };
@@ -37,7 +37,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:3000/auth/google/callback",
+      callbackURL: "https://myfashion-b8i1.onrender.com/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

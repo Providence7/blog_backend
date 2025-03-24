@@ -13,7 +13,7 @@ router.get(
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
     // Redirect after successful login
-    res.redirect("http://localhost:5173/"); // ✅ Redirect to your frontend
+    res.redirect("https://myfashion-b8i1.onrender.com"); // ✅ Redirect to your frontend
   }
 );
 
