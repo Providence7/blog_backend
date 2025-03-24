@@ -1,39 +1,43 @@
-// import User from "../models/users.model.js";
-// import dotenv from "dotenv"
-// dotenv.config()
-// export const getUserSavedPosts = async (req, res) => {
-//   const clerkUserId = req.auth.userId;
+import  User from '../models/users.model';
 
-//   if (!clerkUserId) {
-//     return res.status(401).json("Not authenticated!");
-//   }
+// Get profile data for authenticated user
+export const getProfile = async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'User is not authenticated' });
+  }
 
-//   const user = await User.findOne({ clerkUserId });
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
-//   res.status(200).json(user.savedPosts);
-// };
+// Update profile data for authenticated user (optional)
+export const updateProfile = async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'User is not authenticated' });
+  }
 
-// export const savePost = async (req, res) => {
-//   const clerkUserId = req.auth.userId;
-//   const postId = req.body.postId;
+  const { username, email, profilePicture } = req.body;
 
-//   if (!clerkUserId) {
-//     return res.status(401).json("Not authenticated!");
-//   }
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-//   const user = await User.findOne({ clerkUserId });
+    user.username = username || user.username;
+    user.email = email || user.email;
+    user.profilePicture = profilePicture || user.profilePicture;
 
-//   const isSaved = user.savedPosts.some((p) => p === postId);
-
-//   if (!isSaved) {
-//     await User.findByIdAndUpdate(user._id, {
-//       $push: { savedPosts: postId },
-//     });
-//   } else {
-//     await User.findByIdAndUpdate(user._id, {
-//       $pull: { savedPosts: postId },
-//     });
-//   }
-
-//   res.status(200).json(isSaved ? "Post unsaved" : "Post saved");
-// };
+    await user.save();
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
