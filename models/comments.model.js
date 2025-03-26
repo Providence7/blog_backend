@@ -7,7 +7,7 @@ const commentSchema  =  new Schema(
     email: { type: String, required: true }, // Email for identity
     comment: { type: String, required: true }, // Comment content
     postId: { type: String, required: true, ref: "Post" }, // Link comment to the post using slug
-    photoURL: { type: String, default: "" },
+
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
