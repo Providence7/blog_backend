@@ -1,22 +1,22 @@
 import express from "express";
-import { createPost, getPosts, getPost, updatePost, deletePost } from "../controllers/post.cont.js";
-import { verifyToken, admin } from "../middleware/authMiddleware.js";
+import {
+  getPosts,
+  getPost,
+  createPost,
+  deletePost,
+  uploadAuth,
+  featurePost,
+} from "../controllers/post.cont.js";
+import increaseVisit from "../middleware/increaseVisit.js";
 
 const router = express.Router();
+// thisis  ssk
+router.get("/upload-auth", uploadAuth);
 
-// ✅ Public: Fetch all posts
 router.get("/", getPosts);
-
-// ✅ Public: Fetch a single post by ID
-router.get("/:slug", getPost);
-
-// ✅ Protected: Create a post (Only logged-in users)
-router.post("/", verifyToken, createPost);
-
-// ✅ Protected: Update a post (Only the owner or an admin)
-router.put("/:id", verifyToken, updatePost);
-
-// ✅ Protected: Delete a post (Only admins)
-router.delete("/:id", verifyToken, admin, deletePost);
+router.get("/:slug", increaseVisit, getPost);
+router.post("/", createPost);
+router.delete("/:id", deletePost);
+router.patch("/feature", featurePost);
 
 export default router;

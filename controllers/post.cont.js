@@ -4,51 +4,75 @@ import Post from "../models/posts.model.js";
 // import User from "../models/users.model.js";
 import dotenv from "dotenv"
 dotenv.config()
-
-
-// ✅ GET ALL POSTS WITH FILTERS, PAGINATION & SORTING
 export const getPosts = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 2;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 2;
 
-    const query = {};
-    const { cat, search, sort, featured } = req.query;
+  const query = {};
 
-    if (cat) query.category = cat;
-    if (search) query.title = { $regex: search, $options: "i" };
-    if (featured) query.isFeatured = true;
+  console.log(req.query);
 
-    let sortObj = { createdAt: -1 };
-    if (sort) {
-      switch (sort) {
-        case "newest": sortObj = { createdAt: -1 }; break;
-        case "oldest": sortObj = { createdAt: 1 }; break;
-        case "popular": sortObj = { visit: -1 }; break;
-        case "trending":
-          sortObj = { visit: -1 };
-          query.createdAt = { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) };
-          break;
-        default: break;
-      }
-    }
+  const cat = req.query.cat;
+  const author = req.query.author;
+  const searchQuery = req.query.search;
+  const sortQuery = req.query.sort;
+  const featured = req.query.featured;
 
-    const posts = await Post.find(query).sort(sortObj).limit(limit).skip((page - 1) * limit);
-    const totalPosts = await Post.countDocuments(query);
-    const hasMore = page * limit < totalPosts;
-
-    res.status(200).json({ posts, hasMore });
-  } catch (error) {
-    res.status(500).json({ error: "Error fetching posts", details: error.message });
+  if (cat) {
+    query.category = cat;
   }
+
+  if (searchQuery) {
+    query.title = { $regex: searchQuery, $options: "i" };
+  }
+
+
+  let sortObj = { createdAt: -1 };
+
+  if (sortQuery) {
+    switch (sortQuery) {
+      case "newest":
+        sortObj = { createdAt: -1 };
+        break;
+      case "oldest":
+        sortObj = { createdAt: 1 };
+        break;
+      case "popular":
+        sortObj = { visit: -1 };
+        break;
+      case "trending":
+        sortObj = { visit: -1 };
+        query.createdAt = {
+          $gte: new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000),
+        };
+        break;
+      default:
+        break;
+    }
+  }
+
+  if (featured) {
+    query.isFeatured = true;
+  }
+
+  const posts = await Post.find(query)
+    .sort(sortObj)
+    .limit(limit)
+    .skip((page - 1) * limit);
+
+  const totalPosts = await Post.countDocuments();
+  const hasMore = page * limit < totalPosts;
+
+  res.status(200).json({ posts, hasMore });
 };
 
-// ✅ GET A SINGLE POST BY SLUG
 export const getPost = async (req, res) => {
   try {
     const post = await Post.findOne({ slug: req.params.slug });
 
-    if (!post) return res.status(404).json({ error: "Post not found" });
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" }); // ✅ Proper error handling
+    }
 
     res.status(200).json(post);
   } catch (error) {
@@ -56,14 +80,11 @@ export const getPost = async (req, res) => {
   }
 };
 
-// ✅ CREATE A NEW POST (Only Admins)
+
 export const createPost = async (req, res) => {
   try {
-    if (!req.user || !req.user.isAdmin) {
-      return res.status(403).json({ error: "Admin access required" });
-    }
-
     let slug = req.body.title.replace(/ /g, "-").toLowerCase();
+
     let existingPost = await Post.findOne({ slug });
     let counter = 2;
 
@@ -73,60 +94,52 @@ export const createPost = async (req, res) => {
       counter++;
     }
 
-    const newPost = new Post({ slug, ...req.body, author: req.user.userId });
-    const post = await newPost.save();
+    const newPost = new Post({ slug, ...req.body });
 
-    res.status(201).json({ message: "Post created", slug: post.slug, post });
+    const post = await newPost.save();
+    res.status(201).json({ message: "Post created", slug: post.slug, post }); // ✅ Ensure slug is sent
   } catch (error) {
     res.status(500).json({ error: "Error creating post", details: error.message });
   }
 };
 
-// ✅ DELETE A POST (Only Admins)
+
 export const deletePost = async (req, res) => {
-  try {
-    if (!req.user || !req.user.isAdmin) {
-      return res.status(403).json({ error: "Admin access required" });
-    }
+ 
+  const deletedPost = await Post.findOneAndDelete({
+    _id: req.params.id,
+  });
 
-    const deletedPost = await Post.findByIdAndDelete(req.params.id);
-    if (!deletedPost) return res.status(404).json({ error: "Post not found!" });
-
-    res.status(200).json({ message: "Post has been deleted" });
-  } catch (error) {
-    res.status(500).json({ error: "Error deleting post", details: error.message });
+  if (!deletedPost) {
+    return res.status(403).json("You can delete only your posts!");
   }
+
+  res.status(200).json("Post has been deleted");
 };
 
-// ✅ TOGGLE FEATURED POST STATUS (Only Admins)
-// ✅ UPDATE POST (Only Admins or Post Owner)
-export const updatePost = async (req, res) => {
-  try {
-    const { title, content, isFeatured } = req.body; // Fields that can be updated
-    const post = await Post.findById(req.params.id);
+export const featurePost = async (req, res) => {
+  const postId = req.body.postId;
 
-    if (!post) {
-      return res.status(404).json({ error: "Post not found!" });
-    }
+ 
 
-    // ✅ Check if user is the owner or an admin
-    if (post.user.toString() !== req.user.id && !req.user.isAdmin) {
-      return res.status(403).json({ error: "Unauthorized to update this post!" });
-    }
+  const post = await Post.findById(postId);
 
-    // ✅ Update post fields if provided
-    if (title) post.title = title;
-    if (content) post.content = content;
-    if (isFeatured !== undefined) post.isFeatured = isFeatured;
-
-    await post.save();
-
-    res.status(200).json({ message: "Post updated successfully!", post });
-  } catch (error) {
-    res.status(500).json({ error: "Error updating post", details: error.message });
+  if (!post) {
+    return res.status(404).json("Post not found!");
   }
-};
 
+  const isFeatured = post.isFeatured;
+
+  const updatedPost = await Post.findByIdAndUpdate(
+    postId,
+    {
+      isFeatured: !isFeatured,
+    },
+    { new: true }
+  );
+
+  res.status(200).json(updatedPost);
+};
 
 
 const

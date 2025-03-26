@@ -1,34 +1,31 @@
-import  express from 'express';
-import passport from 'passport';
-import { verifyGoogleToken} from '../middleware/authMiddleware.js'
+import express from "express";
+import User from "../models/users.model.js"; // Import the User model
+
 const router = express.Router();
-// Google OAuth routes
 
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-
-router.get(
-  "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/login" }),
-  (req, res) => {
-    // Redirect after successful login
-    res.redirect("https://myfashion-b8i1.onrender.com"); // ✅ Redirect to your frontend
-  }
-);
-
-// Logout route
-router.get('/logout', (req, res) => {
-  req.logout((err) => {
-    if (err) return res.status(500).send('Logout failed');
-    res.redirect('/');
+// Google login API
+router.post("/google-login", async (req, res) => {
+    try {
+      const { googleId, email, username } = req.body;
+  
+      if (!googleId || !email || !username) {
+        return res.status(400).json({ error: "Missing user data" });
+      }
+  
+      // Check if user already exists
+      let user = await User.findOne({ googleId });
+  
+      if (!user) {
+        user = new User({ googleId, email, username });
+        await user.save();
+      }
+  
+      res.status(200).json({ message: "User authenticated", user });
+    } catch (error) {
+      console.error("❌ Google login error:", error.message);
+      res.status(500).json({ error: "Server error", details: error.message });
+    }
   });
-});
-
-// Route to get the profile data
-router.get('/profile',verifyGoogleToken, (req, res) => {
-  res.json(req.user);
-});
+  
 
 export default router;

@@ -1,24 +1,15 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
-const commentSchema  =  new mongoose.Schema({
-  postId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Post', // Assuming you have a Post model
-    required: true,
+const commentSchema  =  new Schema(
+  {
+    googleId: { type: String, required: true }, // User ID from Google
+    name: { type: String, required: true }, // Display name
+    email: { type: String, required: true }, // Email for identity
+    comment: { type: String, required: true }, // Comment content
+    postId: { type: String, required: true, ref: "Post" }, // Link comment to the post using slug
+    createdAt: { type: Date, default: Date.now },
   },
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-  content: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }
+);
 
 export default mongoose.model("Commment", commentSchema)

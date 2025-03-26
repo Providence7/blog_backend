@@ -1,12 +1,35 @@
-import  express from 'express';
-import  { getComments, postComment } from '../controllers/comment.cont.js';
-import  { verifyToken } from '../middleware/authMiddleware.js';
-const router = express.Router();
+import express from "express";
+import mongoose from "mongoose";
+// import Post from "../models/posts.model.js"
+import Comment from "../models/comments.model.js"; // Import Comment model
 
-// Get comments for a specific post
-router.get('/:postId', getComments);
+const router = express.Router()
+router.post("/comments", async (req, res) => {
+  try {
+    const { googleId, name, email, comment, postId } = req.body;
 
-// Post a comment for a specific post
-router.post('/:postId', verifyToken, postComment);
+    // Ensure postId (slug) exists in Post collection
+    const postExists = await mongoose.model("Post").findOne({ slug: postId });
+    if (!postExists) return res.status(404).json({ error: "Post not found" });
 
-export default router;
+    const newComment = new Comment({ googleId, name, email, comment, postId });
+    await newComment.save();
+    res.status(201).json({ message: "Comment saved successfully", newComment });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to save comment" });
+  }
+});
+
+// ✅ Fetch Comments by Post ID (Slug)
+router.get("/comments/:slug", async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const comments = await Comment.find({ postId: slug }).sort({ createdAt: -1 });
+    res.json(comments);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch comments" });
+  }
+});
+
+
+export default router
