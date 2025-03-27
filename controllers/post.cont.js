@@ -68,10 +68,14 @@ export const getPosts = async (req, res) => {
 
 export const getPost = async (req, res) => {
   try {
-    const post = await Post.findOne({ slug: req.params.slug });
+    const query = mongoose.Types.ObjectId.isValid(req.params.slug)
+      ? { _id: req.params.slug }
+      : { slug: req.params.slug };
+
+    const post = await Post.findOne(query);
 
     if (!post) {
-      return res.status(404).json({ error: "Post not found" }); // ✅ Proper error handling
+      return res.status(404).json({ error: "Post not found" });
     }
 
     res.status(200).json(post);
@@ -79,8 +83,6 @@ export const getPost = async (req, res) => {
     res.status(500).json({ error: "Error fetching post", details: error.message });
   }
 };
-
-
 export const createPost = async (req, res) => {
   try {
     let slug = req.body.title.replace(/ /g, "-").toLowerCase();
@@ -140,7 +142,27 @@ export const featurePost = async (req, res) => {
 
   res.status(200).json(updatedPost);
 };
+export const updateUser = async (req,res) =>{
+  try {
+    const { slug } = req.params;
+    const { title, category, desc, content, img } = req.body;
 
+    // Find and update the post by slug
+    const updatedPost = await Post.findOneAndUpdate(
+      { slug }, // Find by slug
+      { title, category, desc, content, img }, // Update fields
+      { new: true } // Return updated post
+    );
+
+    if (!updatedPost) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    res.json(updatedPost);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+}
 
 const
  imagekit 

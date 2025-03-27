@@ -6,6 +6,7 @@ import {
   deletePost,
   uploadAuth,
   featurePost,
+  updateUser,
 } from "../controllers/post.cont.js";
 import increaseVisit from "../middleware/increaseVisit.js";
 
@@ -17,6 +18,6 @@ router.get("/", getPosts);
 router.get("/:slug", increaseVisit, getPost);
 router.post("/", createPost);
 router.delete("/:id", deletePost);
-router.patch("/feature", featurePost);
+router.put("/:slug", updateUser);
 
 export default router;

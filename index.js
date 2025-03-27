@@ -5,7 +5,9 @@ import newsRouter from './routes/news.js'
 import cors from "cors";
 import commentRoutes from "./routes/comment.route.js"
 import cookieParser from'cookie-parser'
-import authRoute from "./routes/user.route.js"; // Import the auth route
+import authRoute from "./routes/user.route.js"; 
+import adminRoutes from "./routes/admin.route.js";
+
 import dotenv from "dotenv"
 dotenv.config()
 
@@ -22,7 +24,8 @@ app.use(cors(corsOptions));
 app.use("/newsletter", newsRouter);
 app.use("/posts", postRouter);
 app.use("/api", commentRoutes);
-app.use("/api/auth", authRoute); // Register the auth route
+app.use("/api/auth", authRoute); 
+app.use("/api/admin", adminRoutes);
 
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
