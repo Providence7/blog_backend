@@ -4,7 +4,7 @@ import { getTopics, addComment, searchTopics, createTopic } from '../controllers
 const router = express.Router();
 
 // Get all topics
-router.get('/', getTopics);
+router.get('/topics', getTopics);
 
 // Add comment to a topic
 router.post('/:topicId/comments', addComment);
