@@ -3,6 +3,7 @@ import ImageKit from "imagekit";
 import Post from "../models/posts.model.js";
 // import User from "../models/users.model.js";
 import dotenv from "dotenv"
+import mongoose from "mongoose"
 dotenv.config()
 export const getPosts = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
