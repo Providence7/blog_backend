@@ -69,9 +69,7 @@ export const getPosts = async (req, res) => {
 
 export const getPost = async (req, res) => {
   try {
-    const query = mongoose.Types.ObjectId.isValid(req.params.slug)
-      ? { _id: req.params.slug }
-      : { slug: req.params.slug };
+    const query = { slug: req.params.slug };
 
     const post = await Post.findOne(query);
 
