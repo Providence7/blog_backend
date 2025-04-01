@@ -9,6 +9,22 @@ export const getTopics = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+// 🟢 Create a new topic
+export const createTopic = async (req, res) => {
+    const { title, description } = req.body;
+  
+    if (!title || !description) {
+      return res.status(400).json({ error: "Title and description are required" });
+    }
+  
+    try {
+      const newTopic = new Topic({ title, description, comments: [] });
+      await newTopic.save();
+      res.status(201).json(newTopic);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create topic" });
+    }
+  };
 
 // Add comment to a topic
 export const addComment = async (req, res) => {
