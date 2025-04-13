@@ -7,7 +7,7 @@ import commentRoutes from "./routes/comment.route.js"
 import cookieParser from'cookie-parser'
 import authRoute from "./routes/user.route.js"; 
 import adminRoutes from "./routes/admin.route.js";
-import topicRoutes from "./routes/post.route.js";
+import topicRoutes from "./routes/topic.route.js"
 
 
 import dotenv from "dotenv"
@@ -28,7 +28,7 @@ app.use("/posts", postRouter);
 app.use("/api", commentRoutes);
 app.use("/api/auth", authRoute); 
 app.use("/api/admin", adminRoutes);
-app.use("/forum/", topicRoutes);
+app.use("/api/topics", topicRoutes); // Route for topics
 
 
 app.use((error, req, res, next) => {
