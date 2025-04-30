@@ -141,28 +141,6 @@ export const featurePost = async (req, res) => {
 
   res.status(200).json(updatedPost);
 };
-export const updateUser = async (req,res) =>{
-  try {
-    const { slug } = req.params;
-    const { title, category, desc, content, img } = req.body;
-
-    // Find and update the post by slug
-    const updatedPost = await Post.findOneAndUpdate(
-      { slug }, // Find by slug
-      { title, category, desc, content, img }, // Update fields
-      { new: true } // Return updated post
-    );
-
-    if (!updatedPost) {
-      return res.status(404).json({ message: "Post not found" });
-    }
-
-    res.json(updatedPost);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-}
-
 const
  imagekit 
 =
@@ -193,6 +171,44 @@ process.env.IK_URL_ENDPOINT
 }
 )
 ;
+export const updateUser = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { title, category, desc, content, img } = req.body;
+
+    // Handle image upload to ImageKit if a new image is provided
+    let imageUrl = img; // Default to the existing image if no new image is uploaded
+    if (req.files && req.files.img) {
+      const file = req.files.img;
+
+      // Upload the new image to ImageKit
+      const uploadResponse = await imagekit.upload({
+        file: file.data,        // File data from the request
+        fileName: file.name,    // File name
+        folder: '/posts/',      // Optional: specify folder in ImageKit
+      });
+
+      imageUrl = uploadResponse.url; // Get the uploaded image URL
+    }
+
+    // Find and update the post by slug
+    const updatedPost = await Post.findOneAndUpdate(
+      { slug }, // Find by slug
+      { title, category, desc, content, img: imageUrl }, // Update fields, including the image
+      { new: true } // Return updated post
+    );
+
+    if (!updatedPost) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    res.json(updatedPost);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
 
 export const uploadAuth = async (req, res) => {
   const result = imagekit.getAuthenticationParameters();
