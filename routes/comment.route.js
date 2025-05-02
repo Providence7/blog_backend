@@ -21,6 +21,17 @@ router.post("/comments", async (req, res) => {
 });
 
 // ✅ Fetch Comments by Post ID (Slug)
+// GET all comments
+router.get("/comments", async (req, res) => {
+  try {
+    const comments = await Comment.find().sort({ createdAt: -1 });
+    res.json(comments);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch comments." });
+  }
+});
+
+// GET comments for a specific post
 router.get("/comments/:slug", async (req, res) => {
   try {
     const { slug } = req.params;
@@ -30,6 +41,19 @@ router.get("/comments/:slug", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch comments" });
   }
 });
+
+// DELETE a specific comment by postId and email
+router.delete("/comments/:slug/:email", async (req, res) => {
+  const { slug, email } = req.params;
+  try {
+    const result = await Comment.findOneAndDelete({ postId: slug, email });
+    if (!result) return res.status(404).json({ message: "Comment not found." });
+    res.status(200).json({ message: "Comment deleted." });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to delete comment." });
+  }
+});
+
 
 
 export default router

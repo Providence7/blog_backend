@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import Admin from "../models/admin.js";
 import Comment from "../models/comments.model.js";
 import Post from "../models/posts.model.js";
-import User from "../models/users.model.js";
+import Users from "../models/users.model.js";
 
 
 const maxAdmins = 3; // Allow up to 3 admins
@@ -68,7 +68,7 @@ export const loginAdmin = async (req, res) => {
 };
 export const getDashboardStats = async (req, res) => {
   try {
-    const totalUsers = await User.countDocuments();
+    const totalUsers = await Users.countDocuments();
     const totalPosts = await Post.countDocuments();
     const totalComments = await Comment.countDocuments();
 
@@ -91,7 +91,7 @@ export const getDashboardStats = async (req, res) => {
 };
 export const userDash = async (req,res) => {
   try {
-    const users = await User.find({}, "username email"); // Fetch only name & email
+    const users = await Users.find({}, "username email"); // Fetch only name & email
     res.json({ success: true, users });
   } catch (error) {
     console.error("Error fetching users:", error);

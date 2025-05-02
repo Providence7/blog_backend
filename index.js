@@ -12,16 +12,18 @@ import topicRoutes from "./routes/topic.route.js"
 
 import dotenv from "dotenv"
 dotenv.config()
-
 const app = express();
-app.use(express.json());
-
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const corsOptions = {
   origin: process.env.CLIENT_URL1, // Frontend URL
   methods: "GET, POST, PUT, DELETE",
   credentials: true, // Allow cookies to be sent with requests
 };
 app.use(cors(corsOptions));
+
+
+
 
 app.use("/newsletter", newsRouter);
 app.use("/posts", postRouter);
